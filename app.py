@@ -1,201 +1,254 @@
 import streamlit as st, os, base64, io
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, date
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 from reportlab.lib.colors import HexColor
 
-LOGO_PATH = "logo.png"
-def get_logo_b64():
-    if os.path.exists(LOGO_PATH):
-        with open(LOGO_PATH, "rb") as f:
-            return base64.b64encode(f.read()).decode()
+LOGO="logo.png"
+def b64():
+    if os.path.exists(LOGO):
+        with open(LOGO,"rb") as f: return base64.b64encode(f.read()).decode()
     return None
-b64 = get_logo_b64()
-logo_html = f'<img src="data:image/png;base64,{b64}" style="width:54px;height:54px;border-radius:14px;background:white;padding:3px;object-fit:contain">' if b64 else "🛡️"
-page_icon = LOGO_PATH if os.path.exists(LOGO_PATH) else "🛡️"
-
-st.set_page_config(page_title="BRAGI-IA - Talento Inteligente", page_icon=page_icon, layout="wide")
+bg=b64()
+logo_html=f'<img src="data:image/png;base64,{bg}" style="width:62px;height:62px;border-radius:16px;background:white;padding:4px;object-fit:contain">' if bg else "🛡️"
+st.set_page_config(page_title="BRAGI-IA", page_icon=LOGO if os.path.exists(LOGO) else "🛡️", layout="wide")
 
 st.markdown(f"""
 <style>
 .stApp{{background:#F2F3F4}}
-.header{{background:#2D5A4A;padding:14px 28px;display:flex;align-items:center;gap:14px;margin:-60px -80px 20px -80px}}
-.header h1{{color:white;font-size:26px;font-weight:900;margin:0}}
-.card{{background:white;padding:22px;border-radius:20px;box-shadow:0 8px 20px rgba(0,0,0,0.06);margin:10px 0;position:relative;z-index:1}}
-.card-login{{background:white;padding:28px;border-radius:22px;box-shadow:0 12px 30px rgba(0,0,0,0.08)}}
-.watermark{{position:fixed;top:30%;left:-10%;transform:rotate(-24deg);font-size:22px;color:rgba(45,90,74,0.07);font-weight:900;pointer-events:none;width:250%;z-index:0}}
-.progress-bar{{background:#E5E7EB;height:10px;border-radius:10px;overflow:hidden}}
-.progress-fill{{background:#2D5A4A;height:10px}}
+.header{{background:#2D5A4A;padding:12px 24px;display:flex;align-items:center;gap:12px;margin:-60px -80px 10px -80px}}
+.header h1{{color:white;font-size:20px;font-weight:900;margin:0}}
+.card{{background:white;padding:20px;border-radius:18px;box-shadow:0 6px 18px rgba(0,0,0,0.06);margin:8px 0}}
+.watermark{{position:fixed;top:32%;left:-10%;transform:rotate(-24deg);font-size:21px;color:rgba(45,90,74,0.06);font-weight:900;pointer-events:none;width:250%}}
+[data-testid="stSidebar"]{{background:#1E2329}}
+[data-testid="stSidebar"] *{{color:#E5E7EB}}
+div[data-testid="stSidebar"] input{{background:white!important;color:#111!important;border-radius:12px!important}}
+div[data-testid="stExpander"]{{background:#252C34!important;border:none!important;border-radius:12px!important;margin:5px 0}}
 </style>
-<div class="watermark">TALENTO INTELIGENTE • RR.HH • BRAGI-IA • TALENTO INTELIGENTE</div>
-<div class="header">{logo_html}<h1>BRAGI-IA - TALENTO INTELIGENTE</h1></div>
+<div class="watermark">TALENTO INTELIGENTE • RR.HH • BRAGI-IA</div>
+<div class="header">{logo_html}<h1>BRAGI-IA V17 - TALENTO INTELIGENTE • PLAN DE TRABAJO • PLANEACIÓN • INFORMES • HISTÓRICOS</h1></div>
 """, unsafe_allow_html=True)
 
 if "asignaciones" not in st.session_state: st.session_state.asignaciones=[]
 if "resultados" not in st.session_state: st.session_state.resultados=[]
 if "rol" not in st.session_state: st.session_state.rol=None
+if "view" not in st.session_state: st.session_state.view="Asignar"
+if "plan_trabajo" not in st.session_state: st.session_state.plan_trabajo=[]
+if "procesos" not in st.session_state: st.session_state.procesos=[]
 if "cargos_db" not in st.session_state:
-    st.session_state.cargos_db = {
-        "aux_contable": {"nombre":"Auxiliar Contable","preguntas":[
-            {"q":"¿Qué es PUC?","opts":["Plan Único de Cuentas","Pago Único Contable","Presupuesto"],"ok":0,"img":None},
-            {"q":"Imagen: ¿Cuenta 1105 Caja?","opts":["Caja","Bancos","Clientes"],"ok":0,"img":"💰"},
-            {"q":"¿Qué es retención en la fuente?","opts":["Anticipo de impuesto","Multa","Descuento comercial"],"ok":0,"img":None},
-            {"q":"¿IVA?","opts":["Impuesto Valor Agregado","Impuesto Vivienda"],"ok":0,"img":None},
-            {"q":"¿Balance general refleja?","opts":["Situación financiera a una fecha","Solo ingresos"],"ok":0,"img":None},
-        ]},
-        "abogado": {"nombre":"Abogado Tutelas PQR Contratación","preguntas":[
-            {"q":"¿Término para fallar tutela?","opts":["10 días","1 año","6 meses"],"ok":0,"img":None},
-            {"q":"Imagen contrato sin pólizas ¿Qué falta?","opts":["Garantías","Solo firma"],"ok":0,"img":"📄❌"},
-            {"q":"Cláusula forma de pago debe tener","opts":["Objeto, plazo, valor, forma pago, garantías","Solo firma"],"ok":0,"img":None},
-            {"q":"¿SECOP II?","opts":["Sistema Electrónico Contratación Pública","Red social"],"ok":0,"img":None},
-            {"q":"Debido proceso sanción contratista","opts":["Citar, descargos, pruebas, decisión","Sanción directa"],"ok":0,"img":None},
-        ]},
-        "quimico_farma": {"nombre":"Químico Farmacéutico","preguntas":[
-            {"q":"¿BPM según INVIMA?","opts":["Buenas Prácticas Manufactura","Buen Pago Mensual"],"ok":0,"img":None},
-            {"q":"Imagen cadena frío 2-8°C","opts":["Mantener 2-8°C y monitorear","Congelar todo"],"ok":0,"img":"🧊🌡️"},
-            {"q":"¿Farmacovigilancia?","opts":["Detectar efectos adversos","Vender más"],"ok":0,"img":None},
-            {"q":"¿Decreto 677?","opts":["Registro sanitario","Tránsito"],"ok":0,"img":None},
-            {"q":"¿Trazabilidad por lote?","opts":["Seguir desde fabricación hasta dispensación","Solo número"],"ok":0,"img":None},
-        ]},
+    st.session_state.cargos_db={
+        "aux_contable":{"nombre":"Auxiliar Contable","preguntas":[{"q":"¿Qué es PUC?","opts":["Plan Único de Cuentas","Pago Único","Presupuesto"],"ok":0,"img":"💰"}]},
+        "abogado":{"nombre":"Abogado Tutelas","preguntas":[{"q":"¿Término tutela?","opts":["10 días","1 año"],"ok":0,"img":"⚖️"}]},
     }
 
-PSICO = [
-    {"q":"Cuando ves esta imagen ¿qué percibes primero?","img":"🌳👄🌱","opts":["Labios - percibes realidad tal cual","Árboles - ambiciosa, ve adelante","Raíces - progresiva, mejora situación"]},
-    {"q":"Elige la forma que más te atrae","img":"🔺 ⭕ ⬜","opts":["Triángulo - liderazgo y ambición","Círculo - amable, armonía","Cuadrado - orden, disciplina"]},
-    {"q":"¿Qué ves en esta imagen abstracta?","img":"🐺 / 👤","opts":["Lobo - oportunista, trabaja en equipo","Rostro - observador, líder, analiza entorno"]},
-    {"q":"Bajo presión ¿cómo reaccionas?","img":"😰","opts":["Mantengo calma y busco solución","Me bloqueo","Actúo rápido aunque con errores"]},
-    {"q":"¿Prefieres trabajar?","img":"👥","opts":["En equipo colaborativo","Solo con autonomía","Liderando equipo"]},
-]
-
-def gen_pdf(dato):
-    buf=io.BytesIO()
-    c=canvas.Canvas(buf, pagesize=letter)
-    if os.path.exists(LOGO_PATH):
-        try: c.drawImage(LOGO_PATH, 35, 730, width=45, height=45, mask='auto')
+def gen_pdf(d):
+    buf=io.BytesIO(); c=canvas.Canvas(buf,pagesize=letter)
+    if os.path.exists(LOGO):
+        try: c.drawImage(LOGO,35,730,width=45,height=45,mask='auto')
         except: pass
-    c.setFont("Helvetica-Bold", 11); c.setFillColor(HexColor("#2D5A4A"))
-    c.drawString(90,750,"BRAGI-IA - TALENTO INTELIGENTE • RR.HH - CONFIDENCIAL SOLO RRHH")
-    c.setFillColor(HexColor("#2D5A4A"), alpha=0.08); c.setFont("Helvetica-Bold", 22)
-    c.saveState(); c.translate(140,300); c.rotate(-24); c.drawString(0,0,"TALENTO INTELIGENTE • RR.HH • BRAGI-IA"); c.restoreState()
-    c.setFillColor(HexColor("#000000")); c.setFont("Helvetica", 10)
-    y=700
-    for k,v in dato.items():
+    c.setFont("Helvetica-Bold",11); c.setFillColor(HexColor("#2D5A4A")); c.drawString(90,750,"BRAGI-IA - CONFIDENCIAL SOLO RRHH")
+    c.setFillColor(HexColor("#2D5A4A"),alpha=0.07); c.setFont("Helvetica-Bold",20); c.saveState(); c.translate(130,300); c.rotate(-24); c.drawString(0,0,"TALENTO INTELIGENTE • RR.HH • BRAGI-IA"); c.restoreState()
+    c.setFillColor(HexColor("#000000")); c.setFont("Helvetica",10); y=700
+    for k,v in d.items():
         if y<80: c.showPage(); y=700
-        if k not in ["hv_text","score_num"]:
-            c.drawString(40,y,f"{k}: {str(v)[:110]}"); y-=16
-    y-=12; c.setFont("Helvetica-Bold", 11)
-    score=dato.get("score_num",0)
-    rec="90% CONTRATAR - Altamente confiable" if score>=90 else "80% CONTRATAR CON MEJORAS" if score>=80 else "60-79% REGULAR - Segunda entrevista" if score>=60 else "0-59% NO CONTRATAR"
-    c.drawString(40,y,rec)
-    if dato.get("hv_text"):
-        c.setFont("Helvetica",8); c.drawString(40,y-18,f"HV IA: {dato.get('hv_text')[:200]}")
-    c.setFont("Helvetica",7); c.drawString(40,50,"Confidencial - Solo RRHH - BRAGI-IA V13 - Logo: Talento Inteligente RR.HH Bragi-IA")
+        if k not in ["hv_text","score_num"]: c.drawString(40,y,f"{k}: {str(v)[:110]}"); y-=14
     c.showPage(); c.save(); buf.seek(0); return buf
 
 if st.session_state.rol is None:
-    c1,c2=st.columns(2, gap="large")
-    with c1:
-        st.markdown(f'<div class="card-login"><div style="display:flex;gap:12px;align-items:center">{logo_html}<h2>👤 Candidato</h2></div><p style="color:#6B7280">Ingresa con cédula</p>', unsafe_allow_html=True)
-        ced=st.text_input("Cédula", placeholder="Ingrese su cédula", label_visibility="collapsed", key="ced_final")
-        hv_file=st.file_uploader("Subir Hoja de Vida (opcional) para análisis IA", type=["pdf"], key="hv_final")
-        hv_text=""
-        if hv_file:
-            try:
-                import fitz
-                doc=fitz.open(stream=hv_file.read(), filetype="pdf")
-                hv_text=" ".join([p.get_text() for p in doc])[:1000]
-                st.success("HV cargada, IA la analizará")
-            except:
-                hv_text="HV cargada"; st.success("HV cargada")
-        if st.button("Iniciar Sesión", type="primary", use_container_width=True):
-            if ced:
-                st.session_state.ced_actual=ced; st.session_state.hv_actual=hv_text; st.session_state.rol="candidato"; st.rerun()
-        st.markdown('</div>', unsafe_allow_html=True)
-    with c2:
-        st.markdown(f'<div class="card-login"><div style="display:flex;gap:12px;align-items:center">{logo_html}<h2>💼 RRHH Admin</h2></div><p style="color:#6B7280">Solo RRHH ve PDF</p>', unsafe_allow_html=True)
-        u=st.text_input("Usuario", placeholder="admin", label_visibility="collapsed", key="user_final")
-        p=st.text_input("Clave", type="password", placeholder="••••••••", label_visibility="collapsed", key="pass_final")
-        if st.button("Acceder", type="primary", use_container_width=True):
+    st.markdown(f'<div style="max-width:460px;margin:20px auto;background:#1E2329;padding:22px;border-radius:20px;text-align:center"><div style="display:flex;justify-content:center">{logo_html}</div><h2 style="color:white;margin:8px 0 2px 0">BRAGI-IA</h2><p style="color:#9CAF88;font-size:12px;margin:0">TALENTO INTELIGENTE • RR.HH</p></div>', unsafe_allow_html=True)
+    st.markdown('<div style="max-width:460px;margin:0 auto;background:white;padding:24px;border-radius:20px">', unsafe_allow_html=True)
+    tipo=st.radio("Acceso", ["👤 Candidato","💼 RRHH"], horizontal=True, label_visibility="collapsed")
+    st.divider()
+    if "Candidato" in tipo:
+        ced=st.text_input("Cédula", placeholder="Ingresa tu cédula")
+        if st.button("LOG IN", type="primary", use_container_width=True):
+            if ced: st.session_state.ced_actual=ced; st.session_state.rol="candidato"; st.rerun()
+    else:
+        u=st.text_input("Usuario", placeholder="admin"); p=st.text_input("Clave", type="password", placeholder="admin123")
+        if st.button("LOG IN", type="primary", use_container_width=True):
             if u=="admin" and p=="admin123": st.session_state.rol="rrhh"; st.rerun()
-            else: st.error("Credenciales incorrectas")
-        st.markdown('</div>', unsafe_allow_html=True)
-    st.markdown('<div style="text-align:center;color:#6B7280;font-size:11px;margin-top:18px">v13 • Inspirado en personality.co - 3 pasos: Prepárate / Completa 100 preguntas / Recibe insights • Logo TALENTO INTELIGENTE RR.HH BRAGI-IA dentro de runas</div>', unsafe_allow_html=True)
-    st.stop()
+            else: st.error("admin / admin123")
+    st.markdown('</div>', unsafe_allow_html=True); st.stop()
+
+with st.sidebar:
+    st.markdown(f'<div style="display:flex;flex-direction:column;align-items:center;padding:14px 0"><div>{logo_html}</div><b style="color:#9CAF88;margin-top:6px">TALENTO INTELIGENTE</b><span style="color:white;font-size:12px">RR.HH • BRAGI-IA</span></div>', unsafe_allow_html=True)
+    search=st.text_input("search", placeholder="Buscar en el menú... 🔍", label_visibility="collapsed")
+    s=search.lower() if search else ""
+    def show(t): return s in t.lower() if s else True
+
+    if show("gestion talento") or show("talento"):
+        with st.expander("👥 Gestión de Talento", expanded=True):
+            if st.button("📌 Asignar Pruebas", use_container_width=True): st.session_state.view="Asignar"; st.rerun()
+            if st.button("👤 Candidatos", use_container_width=True): st.session_state.view="Candidatos"; st.rerun()
+
+    if show("cargos") or show("preguntas"):
+        with st.expander("💼 Cargos", expanded=True):
+            if st.button("➕ Adicionar Cargo Nuevo", use_container_width=True): st.session_state.view="AddCargo"; st.rerun()
+            if st.button("📋 Ver Cargos", use_container_width=True): st.session_state.view="VerCargos"; st.rerun()
+        with st.expander("❓ Preguntas por Cargo", expanded=True):
+            if st.button("➕ Adicionar Preguntas", use_container_width=True): st.session_state.view="AddPreg"; st.rerun()
+
+    # NUEVOS MODULOS QUE PEDISTE
+    if show("plan trabajo") or show("trabajo"):
+        with st.expander("📅 Plan de Trabajo", expanded=True):
+            if st.button("📅 Crear Plan Trabajo", use_container_width=True): st.session_state.view="PlanTrabajo"; st.rerun()
+            if st.button("📋 Ver Planes", use_container_width=True): st.session_state.view="VerPlanes"; st.rerun()
+
+    if show("planeacion") or show("procesos"):
+        with st.expander("🔄 Planeación de Procesos", expanded=True):
+            if st.button("🔄 Nuevo Proceso", use_container_width=True): st.session_state.view="AddProceso"; st.rerun()
+            if st.button("🔍 Ver Procesos", use_container_width=True): st.session_state.view="VerProcesos"; st.rerun()
+
+    if show("informes") or show("informe"):
+        with st.expander("📈 Informes", expanded=False):
+            if st.button("📈 Generar Informes", use_container_width=True): st.session_state.view="Informes"; st.rerun()
+
+    if show("historicos") or show("historico"):
+        with st.expander("🕘 Históricos", expanded=False):
+            if st.button("🕘 Ver Históricos", use_container_width=True): st.session_state.view="Historicos"; st.rerun()
+
+    if show("dashboard"):
+        with st.expander("📊 Dashboard RRHH"):
+            if st.button("📊 Dashboard", use_container_width=True): st.session_state.view="Dash"; st.rerun()
+
+    st.divider()
+    if st.button("Cerrar sesión", use_container_width=True): st.session_state.rol=None; st.rerun()
 
 if st.session_state.rol=="rrhh":
-    t1,t2,t3,t4=st.tabs(["📌 Asignar Pruebas","⚙️ Tabla Cargos y Preguntas","📊 Dashboard PDF solo RRHH","📚 Psicología con Imágenes"])
-    with t1:
-        with st.form("asig_final"):
+    v=st.session_state.view
+    if v=="Asignar":
+        st.markdown('<div class="card"><h3>📌 Asignar Pruebas</h3></div>', unsafe_allow_html=True)
+        with st.form("asig"):
             c1,c2=st.columns(2)
             with c1: ced=st.text_input("Cédula*"); nom=st.text_input("Nombre*")
-            with c2:
-                cargo=st.selectbox("Cargo*", list(st.session_state.cargos_db.keys()), format_func=lambda x: st.session_state.cargos_db[x]["nombre"])
-                asig=st.text_input("Asignado por*", value="Maria C. RRHH")
+            with c2: cargo=st.selectbox("Cargo*", list(st.session_state.cargos_db.keys()), format_func=lambda x: st.session_state.cargos_db[x]["nombre"]); asig=st.text_input("Asignado por*", value="RRHH BRAGI-IA")
             if st.form_submit_button("✅ Asignar", type="primary", use_container_width=True):
-                st.session_state.asignaciones.append({"cedula":ced,"nombre":nom,"cargo_key":cargo,"cargo_nombre":st.session_state.cargos_db[cargo]["nombre"],"asignado_por":asig,"fecha":datetime.now().strftime("%Y-%m-%d %H:%M")})
-                st.success(f"Asignado {nom} - {cargo}")
-    with t2:
-        st.markdown('<div class="card"><h3>Tabla editable - incorpora cargos y preguntas según cargo</h3><p>Agrega filas, edita, borra - como Excel</p></div>', unsafe_allow_html=True)
-        df_cargos=pd.DataFrame([{"ID":k,"Nombre":v["nombre"],"Preguntas":len(v["preguntas"])} for k,v in st.session_state.cargos_db.items()])
-        ed=st.data_editor(df_cargos, num_rows="dynamic", use_container_width=True, key="ed_cargos_final")
-        if st.button("💾 Guardar cargos"):
-            for _,r in ed.iterrows():
-                if r["ID"] in st.session_state.cargos_db: st.session_state.cargos_db[r["ID"]]["nombre"]=r["Nombre"]
-            st.success("Guardado")
-        sel=st.selectbox("Cargo para editar preguntas", list(st.session_state.cargos_db.keys()), format_func=lambda x: st.session_state.cargos_db[x]["nombre"], key="sel_final")
-        df_p=pd.DataFrame([{"Pregunta":p["q"],"Correcta":p["opts"][0],"O2":p["opts"][1] if len(p["opts"])>1 else "","O3":p["opts"][2] if len(p["opts"])>2 else "","Imagen/Emoji":p.get("img","")} for p in st.session_state.cargos_db[sel]["preguntas"]])
-        ed2=st.data_editor(df_p, num_rows="dynamic", use_container_width=True, key=f"ed_{sel}_final")
-        if st.button("💾 Guardar preguntas de este cargo"):
-            st.session_state.cargos_db[sel]["preguntas"]=[{"q":r["Pregunta"],"opts":[r["Correcta"],r["O2"],r["O3"]],"ok":0,"img":r["Imagen/Emoji"]} for _,r in ed2.iterrows() if r["Pregunta"]]
-            st.success("Guardado"); st.rerun()
-        with st.expander("➕ Crear nuevo cargo vacío"):
-            nid=st.text_input("ID sin espacios ej: aux_logistica"); nnom=st.text_input("Nombre cargo ej: Auxiliar Logística")
-            if st.button("Crear cargo nuevo"):
-                if nid and nnom: st.session_state.cargos_db[nid]={"nombre":nnom,"preguntas":[]}; st.success("Creado"); st.rerun()
-    with t3:
-        st.markdown('<div class="card"><h3>Dashboard - PDF solo lo ve RRHH</h3></div>', unsafe_allow_html=True)
+                st.session_state.asignaciones.append({"cedula":ced,"nombre":nom,"cargo_key":cargo,"cargo_nombre":st.session_state.cargos_db[cargo]["nombre"],"asignado_por":asig,"fecha":datetime.now().strftime("%Y-%m-%d %H:%M")}); st.success("Asignado")
+
+    elif v=="AddCargo":
+        st.markdown('<div class="card"><h3>💼 SUB-VENTANA: Adicionar Cargos</h3></div>', unsafe_allow_html=True)
+        with st.form("newc"):
+            nid=st.text_input("ID*"); nnom=st.text_input("Nombre*")
+            if st.form_submit_button("💾 Crear", type="primary"):
+                if nid and nnom: st.session_state.cargos_db[nid]={"nombre":nnom,"preguntas":[]}; st.success("Creado")
+
+    elif v=="AddPreg":
+        st.markdown('<div class="card"><h3>❓ SUB-VENTANA: Adicionar Preguntas que se requiera dentro de Preguntas por Cargo</h3></div>', unsafe_allow_html=True)
+        sel=st.selectbox("Cargo", list(st.session_state.cargos_db.keys()), format_func=lambda x: st.session_state.cargos_db[x]["nombre"])
+        with st.form(f"ap_{sel}"):
+            pq=st.text_area("Pregunta*"); o1=st.text_input("Correcta*"); o2=st.text_input("O2"); o3=st.text_input("O3")
+            if st.form_submit_button("💾 Adicionar", type="primary"):
+                if pq and o1: st.session_state.cargos_db[sel]["preguntas"].append({"q":pq,"opts":[o1,o2 or "B",o3 or "C"],"ok":0}); st.success("Adicionada")
+
+    elif v=="PlanTrabajo":
+        st.markdown('<div class="card"><h3>📅 Plan de Trabajo - Nuevo</h3><p>Define tareas, responsables, fechas para proceso selección</p></div>', unsafe_allow_html=True)
+        with st.form("plan_trabajo"):
+            c1,c2=st.columns(2)
+            with c1:
+                titulo=st.text_input("Título Plan* Ej: Plan Selección Aux Contable Q1 2026")
+                responsable=st.text_input("Responsable* Ej: Maria RRHH")
+                fecha_ini=st.date_input("Fecha Inicio", value=date.today())
+            with c2:
+                cargo_rel=st.selectbox("Cargo Relacionado", list(st.session_state.cargos_db.keys()), format_func=lambda x: st.session_state.cargos_db[x]["nombre"])
+                fecha_fin=st.date_input("Fecha Fin")
+                prioridad=st.selectbox("Prioridad", ["Alta","Media","Baja"])
+            tareas=st.text_area("Tareas / Actividades* (una por línea) Ej:\n1. Publicar vacante\n2. Filtrar HV\n3. Aplicar pruebas BRAGI-IA\n4. Entrevista\n5. Informe final")
+            if st.form_submit_button("💾 Guardar Plan de Trabajo", type="primary", use_container_width=True):
+                st.session_state.plan_trabajo.append({"titulo":titulo,"responsable":responsable,"cargo":cargo_rel,"cargo_nombre":st.session_state.cargos_db[cargo_rel]["nombre"],"inicio":str(fecha_ini),"fin":str(fecha_fin),"prioridad":prioridad,"tareas":tareas,"fecha_creacion":datetime.now().strftime("%Y-%m-%d %H:%M"),"estado":"En Curso"})
+                st.success("Plan de Trabajo creado"); st.rerun()
+
+    elif v=="VerPlanes":
+        st.markdown('<div class="card"><h3>📋 Planes de Trabajo - Históricos</h3></div>', unsafe_allow_html=True)
+        if st.session_state.plan_trabajo:
+            df=pd.DataFrame(st.session_state.plan_trabajo)
+            st.dataframe(df, use_container_width=True)
+            for i,pl in enumerate(st.session_state.plan_trabajo):
+                with st.expander(f"📅 {pl['titulo']} - {pl['estado']}"):
+                    st.write(f"**Responsable:** {pl['responsable']} | **Cargo:** {pl['cargo_nombre']} | **Prioridad:** {pl['prioridad']}")
+                    st.write(f"**Fechas:** {pl['inicio']} al {pl['fin']}")
+                    st.write(f"**Tareas:**\n{pl['tareas']}")
+                    if st.button(f"✅ Marcar completado", key=f"comp_{i}"):
+                        st.session_state.plan_trabajo[i]["estado"]="Completado"; st.rerun()
+        else: st.info("Sin planes aún - crea uno")
+
+    elif v=="AddProceso":
+        st.markdown('<div class="card"><h3>🔄 Planeación de Procesos - Nuevo Proceso</h3><p>Define flujo del proceso de selección</p></div>', unsafe_allow_html=True)
+        with st.form("proceso"):
+            nombre=st.text_input("Nombre Proceso* Ej: Proceso Selección FARMART 2026")
+            c1,c2=st.columns(2)
+            with c1:
+                etapas=st.text_area("Etapas del Proceso* (una por línea) Ej:\n1. Reclutamiento\n2. Pruebas BRAGI-IA\n3. Psicología con imágenes\n4. Entrevista RRHH\n5. Validación jefe\n6. Contratación")
+                responsable=st.text_input("Líder Proceso*")
+            with c2:
+                tiempo=st.text_input("Tiempo Estimado Ej: 15 días")
+                indicadores=st.text_area("Indicadores / KPIs Ej:\n- Tiempo contratación\n- % candidatos >=80%\n- Retención")
+            if st.form_submit_button("💾 Guardar Proceso", type="primary", use_container_width=True):
+                st.session_state.procesos.append({"nombre":nombre,"etapas":etapas,"responsable":responsable,"tiempo":tiempo,"indicadores":indicadores,"fecha":datetime.now().strftime("%Y-%m-%d %H:%M"),"estado":"Activo"})
+                st.success("Proceso guardado"); st.rerun()
+
+    elif v=="VerProcesos":
+        st.markdown('<div class="card"><h3>🔍 Planeación de Procesos - Históricos</h3></div>', unsafe_allow_html=True)
+        if st.session_state.procesos:
+            st.dataframe(pd.DataFrame(st.session_state.procesos), use_container_width=True)
+            for pr in st.session_state.procesos:
+                with st.expander(f"🔄 {pr['nombre']}"):
+                    st.write(pr)
+        else: st.info("Sin procesos")
+
+    elif v=="Informes":
+        st.markdown('<div class="card"><h3>📈 Informes - BRAGI-IA</h3></div>', unsafe_allow_html=True)
+        c1,c2,c3,c4=st.columns(4)
+        with c1: st.metric("Total Evaluados", len(st.session_state.resultados))
+        with c2: st.metric("Planes Activos", len([p for p in st.session_state.plan_trabajo if p["estado"]=="En Curso"]))
+        with c3: st.metric("Procesos Activos", len(st.session_state.procesos))
+        with c4: st.metric("Cargos", len(st.session_state.cargos_db))
         if st.session_state.resultados:
             df=pd.DataFrame(st.session_state.resultados)
-            c1,c2,c3,c4=st.columns(4)
-            with c1: st.metric("Total", len(df))
-            with c2: st.metric("Promedio", f"{df['score_num'].mean():.1f}%")
-            with c3: st.metric(">=80%", len(df[df["score_num"]>=80]))
-            with c4: st.metric(">=90%", len(df[df["score_num"]>=90]))
             st.bar_chart(df["cargo_nombre"].value_counts())
+            st.bar_chart(df["score_num"])
+            csv=df.to_csv(index=False).encode('utf-8')
+            st.download_button("📥 Descargar Informe CSV", csv, "informe_bragi_ia.csv", "text/csv")
             st.dataframe(df, use_container_width=True)
+
+    elif v=="Historicos":
+        st.markdown('<div class="card"><h3>🕘 Históricos - Todo el historial</h3></div>', unsafe_allow_html=True)
+        t1,t2,t3=st.tabs(["Asignaciones","Resultados","Planes y Procesos"])
+        with t1:
+            if st.session_state.asignaciones: st.dataframe(pd.DataFrame(st.session_state.asignaciones), use_container_width=True)
+            else: st.info("Sin asignaciones")
+        with t2:
+            if st.session_state.resultados:
+                df=pd.DataFrame(st.session_state.resultados)
+                st.dataframe(df, use_container_width=True)
+                for i,r in enumerate(df.to_dict(orient="records")):
+                    pdf=gen_pdf(r); st.download_button(f"🔒 PDF {r['cedula']} {r['score']}", pdf, f"HIST_{r['cedula']}.pdf","application/pdf", key=f"hist_{i}")
+            else: st.info("Sin resultados")
+        with t3:
+            st.write("**Planes:**"); st.dataframe(pd.DataFrame(st.session_state.plan_trabajo), use_container_width=True)
+            st.write("**Procesos:**"); st.dataframe(pd.DataFrame(st.session_state.procesos), use_container_width=True)
+
+    elif v=="Dash":
+        st.markdown('<div class="card"><h3>📊 Dashboard - PDF solo RRHH</h3></div>', unsafe_allow_html=True)
+        if st.session_state.resultados:
+            df=pd.DataFrame(st.session_state.resultados); st.dataframe(df, use_container_width=True)
             for i,r in enumerate(df.to_dict(orient="records")):
-                pdf=gen_pdf(r)
-                st.download_button(f"🔒 PDF CONFIDENCIAL SOLO RRHH {r['cedula']} {r['cargo_nombre']} {r['score']}", pdf, f"CONFIDENCIAL_RRHH_{r['cedula']}.pdf", "application/pdf", key=f"pdf_{i}")
-        else: st.info("Sin resultados aún")
-    with t4:
-        st.markdown('<div class="card"><h3>📚 Psicología con imágenes estilo personality.co</h3><p>How it works personality.co: 1 Prepárate lugar tranquilo 2 Completa 100 preguntas con imágenes 3 Recibe reporte con fortalezas, retos, certificado</p></div>', unsafe_allow_html=True)
-        for ps in PSICO: st.markdown(f'<div class="card"><div style="font-size:36px">{ps["img"]}</div><b>{ps["q"]}</b><br>{ps["opts"]}</div>', unsafe_allow_html=True)
-    if st.button("Cerrar sesión RRHH"): st.session_state.rol=None; st.rerun()
+                pdf=gen_pdf(r); st.download_button(f"🔒 PDF {r['cedula']}", pdf, f"RRHH_{r['cedula']}.pdf","application/pdf", key=f"d_{i}")
+        else: st.info("Sin resultados")
 
 if st.session_state.rol=="candidato":
-    ced=st.session_state.ced_actual
-    mis=[a for a in st.session_state.asignaciones if a["cedula"]==ced]
-    if not mis: st.error(f"Cédula {ced} sin pruebas");
+    ced=st.session_state.ced_actual; mis=[a for a in st.session_state.asignaciones if a["cedula"]==ced]
+    if not mis: st.error("Sin pruebas")
     else:
-        st.markdown(f'<div class="card"><h3>Progreso estilo personality.co - {ced}</h3><div class="progress-bar"><div class="progress-fill" style="width:60%"></div></div><p>Paso 2 de 3 - Completa el test</p></div>', unsafe_allow_html=True)
         for idx,asig in enumerate(mis):
             cargo=st.session_state.cargos_db.get(asig["cargo_key"])
             if not cargo: continue
-            st.markdown(f'<div class="card"><h3>{cargo["nombre"]} - Asignado por {asig["asignado_por"]}</h3></div>', unsafe_allow_html=True)
-            with st.form(f"form_{ced}_{idx}"):
+            st.markdown(f'<div class="card"><h3>{cargo["nombre"]}</h3></div>', unsafe_allow_html=True)
+            with st.form(f"f{idx}"):
                 resps=[]
                 for i,pr in enumerate(cargo["preguntas"]):
-                    if pr.get("img"): st.markdown(f'<div style="font-size:38px;text-align:center">{pr["img"]}</div>', unsafe_allow_html=True)
-                    st.write(f"**{i+1}. {pr['q']}**"); r=st.radio("Elige", pr["opts"], index=None, key=f"r_{ced}_{idx}_{i}"); resps.append(r)
-                st.divider(); st.write("**🧠 Psicología con imágenes (estilo personality.co):**")
-                rp=[]
-                for j,ps in enumerate(PSICO):
-                    st.markdown(f'<div style="font-size:30px">{ps["img"]}</div><b>{ps["q"]}</b>', unsafe_allow_html=True)
-                    r2=st.radio(f"ps {j}", ps["opts"], index=None, key=f"ps_{ced}_{idx}_{j}"); rp.append(r2)
-                caso=st.text_area("Caso práctico / Redacción")
-                if st.form_submit_button("🚀 FINALIZAR - Enviar automático a RRHH", type="primary", use_container_width=True):
+                    st.write(f"**{i+1}. {pr['q']}**"); r=st.radio("Elige", pr["opts"], index=None, key=f"r{idx}_{i}"); resps.append(r)
+                if st.form_submit_button("🚀 FINALIZAR", type="primary", use_container_width=True):
                     ac=sum(1 for j,rr in enumerate(resps) if rr==cargo["preguntas"][j]["opts"][0]); tot=len(cargo["preguntas"]) or 1; sc=int(ac/tot*100)
-                    st.session_state.resultados.append({"cedula":ced,"nombre":asig["nombre"],"cargo_nombre":cargo["nombre"],"asignado_por":asig["asignado_por"],"score":f"{sc}%","score_num":sc,"aciertos":f"{ac}/{tot}","hv_text":st.session_state.get("hv_actual","")[:250],"caso":caso[:200],"fecha":datetime.now().strftime("%Y-%m-%d %H:%M")})
-                    st.balloons(); st.success(f"✅ {sc}% Enviado a RRHH - PDF solo lo ve RRHH")
-    if st.button("Cerrar sesión"): st.session_state.rol=None; st.rerun()
+                    st.session_state.resultados.append({"cedula":ced,"nombre":asig["nombre"],"cargo_nombre":cargo["nombre"],"asignado_por":asig["asignado_por"],"score":f"{sc}%","score_num":sc,"fecha":datetime.now().strftime("%Y-%m-%d %H:%M")})
+                    st.balloons(); st.success(f"✅ {sc}% Enviado")
