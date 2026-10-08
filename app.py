@@ -11,40 +11,61 @@ def b64():
         with open(LOGO,"rb") as f: return base64.b64encode(f.read()).decode()
     return None
 bg=b64()
-logo_html=f'<img src="data:image/png;base64,{bg}" style="width:60px;height:60px;border-radius:14px;background:white;padding:3px;object-fit:contain">' if bg else "🛡️"
+logo_html=f'<img src="data:image/png;base64,{bg}" style="width:88px;height:88px;border-radius:18px;object-fit:contain;filter:drop-shadow(0 4px 12px rgba(0,0,0,0.4))">' if bg else "🛡️"
 
-st.set_page_config(page_title="BRAGI-IA", page_icon=LOGO if os.path.exists(LOGO) else "🛡️", layout="wide")
+st.set_page_config(page_title="BRAGI-IA V21 - RRHH", page_icon=LOGO if os.path.exists(LOGO) else "🛡️", layout="wide")
 
-st.markdown(f"""
-<style>
-.stApp{{background:#E8F5E9}}
-.header{{background:#2D5A4A;padding:12px 24px;display:flex;align-items:center;gap:12px;margin:-60px -80px 12px -80px;box-shadow:0 4px 12px rgba(0,0,0,0.08)}}
-.header h1{{color:white;font-size:19px;font-weight:900;margin:0}}
-.card{{background:white;padding:20px;border-radius:18px;box-shadow:0 6px 18px rgba(45,90,74,0.08);margin:8px 0;border:1px solid #E8F5E9}}
-.watermark{{position:fixed;top:32%;left:-10%;transform:rotate(-24deg);font-size:20px;color:rgba(45,90,74,0.05);font-weight:900;pointer-events:none;width:250%}}
-[data-testid="stSidebar"]{{background:white;border-right:1px solid #D1E7DD;box-shadow:4px 0 20px rgba(0,0,0,0.05)}}
-[data-testid="stSidebar"] *{{color:#1F2937}}
-div[data-testid="stSidebar"] input{{background:#F6FBF7!important;color:#111!important;border-radius:12px!important;border:1.5px solid #D1E7DD!important}}
-div[data-testid="stExpander"]{{background:#F6FBF7!important;border:1px solid #E8F5E9!important;border-radius:12px!important;margin:6px 0}}
-div[data-testid="stExpander"] summary{{color:#2D5A4A!important;font-weight:700}}
-.sidebar-logo{{display:flex;flex-direction:column;align-items:center;padding:18px 0 12px 0;border-bottom:1.5px solid #E8F5E9;margin-bottom:8px}}
-.cat-icon{{background:#D1E7DD;padding:6px;border-radius:8px;color:#2D5A4A}}
-</style>
-<div class="watermark">TALENTO INTELIGENTE • RR.HH • BRAGI-IA</div>
-<div class="header">{logo_html}<h1>BRAGI-IA V18 • TALENTO INTELIGENTE • FONDO CLARO VERDE MODA • RR.HH</h1></div>
-""", unsafe_allow_html=True)
+is_login = "rol" not in st.session_state or st.session_state.rol is None
+
+if is_login:
+    st.markdown(f"""
+    <style>
+   .stApp{{background:#0F1514;background-image: radial-gradient(circle at 20% 50%, rgba(45,90,74,0.15) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(45,90,74,0.2) 0%, transparent 50%);}}
+   .login-card{{background:#3A424E;border-radius:24px;padding:28px 26px;max-width:420px;margin:20px auto;box-shadow:0 20px 60px rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.08)}}
+   .login-title{{color:white;font-size:42px;font-weight:900;text-align:center;margin:12px 0 4px 0;letter-spacing:1px}}
+   .login-sub{{color:#CBD5E1;font-size:13px;text-align:center;margin-bottom:18px}}
+   .label-pill{{background:#5A5F6A;color:white;font-size:11px;padding:4px 10px;border-radius:6px;display:inline-block;margin-bottom:6px;margin-top:12px}}
+   .footer-login{{color:#9CA3AF;font-size:12px;text-align:center;margin-top:18px}}
+    div[data-testid="stSelectbox"] > div{{background:white!important;border-radius:12px!important;height:52px}}
+    </style>
+    """, unsafe_allow_html=True)
+else:
+    st.markdown(f"""
+    <style>
+   .stApp{{background:#D6EED8}}
+   .header{{background:white;padding:10px 22px;display:flex;align-items:center;justify-content:space-between;margin:-60px -80px 12px -80px;box-shadow:0 2px 10px rgba(0,0,0,0.06)}}
+   .card{{background:white;padding:18px;border-radius:16px;box-shadow:0 6px 18px rgba(0,0,0,0.05);margin:8px 0;border:1px solid #E8F5E9}}
+   .kpi-card{{border-radius:16px;padding:16px;color:white;min-height:110px;box-shadow:0 6px 16px rgba(0,0,0,0.12)}}
+   .kpi-red{{background:#E74C3C}}.kpi-orange{{background:#F39C12}}.kpi-green{{background:#5A9A3B}}.kpi-blue{{background:#2E86DE}}.kpi-orange2{{background:#E67E22}}
+    [data-testid="stSidebar"]{{background:white;border-right:1px solid #D1E7DD}}
+    [data-testid="stSidebar"] *{{color:#1F2937}}
+    div[data-testid="stSidebar"] input{{background:#F3F8F4!important;border-radius:12px!important;border:1px solid #D1E7DD!important}}
+    div[data-testid="stExpander"]{{background:#F6FBF7!important;border:1px solid #E8F5E9!important;border-radius:12px!important;margin:5px 0}}
+    </style>
+    <div class="header"><div style="display:flex;align-items:center;gap:12px">{logo_html}<div><h1 style="margin:0;color:#1A3C2A;font-size:20px">BRAGI-IA</h1><small style="color:#6B7280">TALENTO INTELIGENTE • RR.HH • BRAGI-IA</small></div></div><div style="background:#D6EED8;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center">ZP</div></div>
+    """, unsafe_allow_html=True)
 
 if "asignaciones" not in st.session_state: st.session_state.asignaciones=[]
 if "resultados" not in st.session_state: st.session_state.resultados=[]
 if "rol" not in st.session_state: st.session_state.rol=None
-if "view" not in st.session_state: st.session_state.view="Asignar"
+if "view" not in st.session_state: st.session_state.view="Dashboard"
+if "categorias" not in st.session_state:
+    st.session_state.categorias=[
+        {"ID":1,"Descripcion":"CARGOS - BRAGI-IA","Vida Util":0},
+        {"ID":2,"Descripcion":"PREGUNTAS POR CARGO","Vida Util":0},
+        {"ID":3,"Descripcion":"PLAN DE TRABAJO","Vida Util":2},
+        {"ID":4,"Descripcion":"PLANEACION DE PROCESOS","Vida Util":3},
+        {"ID":5,"Descripcion":"INFORMES","Vida Util":1},
+        {"ID":6,"Descripcion":"HISTORICOS","Vida Util":1},
+    ]
+if "subcategorias" not in st.session_state: st.session_state.subcategorias=[]
 if "plan_trabajo" not in st.session_state: st.session_state.plan_trabajo=[]
 if "procesos" not in st.session_state: st.session_state.procesos=[]
 if "cargos_db" not in st.session_state:
     st.session_state.cargos_db={
-        "aux_contable":{"nombre":"Auxiliar Contable","preguntas":[{"q":"¿Qué es PUC?","opts":["Plan Único de Cuentas","Pago Único","Presupuesto"],"ok":0,"img":"💰"}]},
-        "abogado":{"nombre":"Abogado Tutelas","preguntas":[{"q":"¿Término tutela?","opts":["10 días","1 año"],"ok":0,"img":"⚖️"}]},
-        "quimico":{"nombre":"Químico Farmacéutico","preguntas":[{"q":"¿BPM?","opts":["Buenas Prácticas","Buen Pago"],"ok":0,"img":"🧪"}]},
+        "aux_contable":{"nombre":"Auxiliar Contable","preguntas":[{"q":"¿Qué es PUC?","opts":["Plan Único de Cuentas","Pago Único","Presupuesto"],"ok":0}]},
+        "abogado":{"nombre":"Abogado Tutelas PQR Contratación","preguntas":[{"q":"¿Término tutela?","opts":["10 días","1 año","6 meses"],"ok":0}]},
+        "quimico":{"nombre":"Químico Farmacéutico","preguntas":[{"q":"¿BPM según INVIMA?","opts":["Buenas Prácticas Manufactura","Buen Pago"],"ok":0}]},
     }
 
 def gen_pdf(d):
@@ -53,53 +74,74 @@ def gen_pdf(d):
         try: c.drawImage(LOGO,35,730,width=45,height=45,mask='auto')
         except: pass
     c.setFont("Helvetica-Bold",11); c.setFillColor(HexColor("#2D5A4A")); c.drawString(90,750,"BRAGI-IA - TALENTO INTELIGENTE • RR.HH - CONFIDENCIAL")
-    c.setFillColor(HexColor("#2D5A4A"),alpha=0.06); c.setFont("Helvetica-Bold",20); c.saveState(); c.translate(130,300); c.rotate(-24); c.drawString(0,0,"TALENTO INTELIGENTE • RR.HH • BRAGI-IA"); c.restoreState()
-    c.setFillColor(HexColor("#000000")); c.setFont("Helvetica",10); y=700
+    c.setFont("Helvetica",10); c.setFillColor(HexColor("#000000")); y=700
     for k,v in d.items():
         if y<80: c.showPage(); y=700
-        if k not in ["hv_text","score_num"]: c.drawString(40,y,f"{k}: {str(v)[:110]}"); y-=14
+        if k not in ["score_num"]: c.drawString(40,y,f"{k}: {str(v)[:110]}"); y-=14
     c.showPage(); c.save(); buf.seek(0); return buf
 
-# LOGIN UNICO CLARO
+# LOGIN QUE TE GUSTO - RRHH / INVITADO A PRUEBA
 if st.session_state.rol is None:
-    st.markdown(f'<div style="max-width:460px;margin:20px auto;background:white;padding:22px;border-radius:20px;text-align:center;box-shadow:0 10px 30px rgba(45,90,74,0.1);border:1px solid #D1E7DD"><div style="display:flex;justify-content:center">{logo_html}</div><h2 style="color:#2D5A4A;margin:8px 0 2px 0">BRAGI-IA</h2><p style="color:#9CAF88;font-size:12px;margin:0">TALENTO INTELIGENTE • RR.HH • BRAGI-IA</p></div>', unsafe_allow_html=True)
-    st.markdown('<div style="max-width:460px;margin:0 auto;background:white;padding:24px;border-radius:20px;box-shadow:0 8px 24px rgba(0,0,0,0.06)">', unsafe_allow_html=True)
-    tipo=st.radio("Acceso", ["👤 Candidato","💼 RRHH"], horizontal=True, label_visibility="collapsed")
-    st.divider()
-    if "Candidato" in tipo:
-        ced=st.text_input("Cédula", placeholder="Ingresa tu cédula")
-        if st.button("LOG IN", type="primary", use_container_width=True):
-            if ced: st.session_state.ced_actual=ced; st.session_state.rol="candidato"; st.rerun()
-    else:
-        u=st.text_input("Usuario", placeholder="admin"); p=st.text_input("Clave", type="password", placeholder="admin123")
-        if st.button("LOG IN", type="primary", use_container_width=True):
-            if u=="admin" and p=="admin123": st.session_state.rol="rrhh"; st.rerun()
-            else: st.error("admin / admin123")
-    st.markdown('</div>', unsafe_allow_html=True); st.stop()
+    st.markdown(f'<div class="login-card"><div style="display:flex;justify-content:center">{logo_html}</div><div class="login-title">LOGIN</div><div class="login-sub">Plataforma de Talento Humano • BRAGI-IA</div>', unsafe_allow_html=True)
 
+    st.markdown('<div class="label-pill">Organización</div>', unsafe_allow_html=True)
+    org=st.selectbox("org", ["RRHH","INVITADO A PRUEBA"], label_visibility="collapsed", key="org_login")
+
+    st.markdown('<div class="label-pill">Tipo de Acceso</div>', unsafe_allow_html=True)
+    cargo_sel=st.selectbox("cargo", ["SELECCIONAR CARGO","INVITADO A PRUEBA - CANDIDATO","RRHH - ADMINISTRADOR","AUXILIAR CONTABLE","ABOGADO TUTELAS","QUIMICO FARMACEUTICO"], label_visibility="collapsed", key="cargo_login")
+
+    st.markdown('<div style="margin-top:18px"></div>', unsafe_allow_html=True)
+
+    if "RRHH" in org or "RRHH" in cargo_sel or "ADMINISTRADOR" in cargo_sel:
+        u=st.text_input("user", placeholder="Usuario: admin", label_visibility="collapsed", key="user_login")
+        p=st.text_input("pass", type="password", placeholder="Clave: admin123", label_visibility="collapsed", key="pass_login")
+        c1,c2=st.columns([1,4])
+        with c1: st.markdown('<div style="background:#E74C3C;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:22px">←</div>', unsafe_allow_html=True)
+        with c2:
+            if st.button("LOG IN", type="primary", use_container_width=True, key="login_rrhh"):
+                if u=="admin" and p=="admin123": st.session_state.rol="rrhh"; st.rerun()
+                else: st.error("Credenciales: admin / admin123")
+    else:
+        ced=st.text_input("ced", placeholder="Cédula Invitado a Prueba", label_visibility="collapsed", key="ced_login")
+        nom=st.text_input("nom", placeholder="Nombre completo", label_visibility="collapsed", key="nom_login")
+        c1,c2=st.columns([1,4])
+        with c1: st.markdown('<div style="background:#E74C3C;width:52px;height:52px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:white;font-size:22px">←</div>', unsafe_allow_html=True)
+        with c2:
+            if st.button("LOG IN", type="primary", use_container_width=True, key="login_cand"):
+                if ced:
+                    st.session_state.ced_actual=ced
+                    st.session_state.nombre_actual=nom or "Invitado"
+                    # Auto-asignar si no tiene
+                    if not any(a["cedula"]==ced for a in st.session_state.asignaciones):
+                        # asignar segun cargo seleccionado
+                        key_cargo="aux_contable"
+                        if "ABOGADO" in cargo_sel: key_cargo="abogado"
+                        if "QUIMICO" in cargo_sel: key_cargo="quimico"
+                        st.session_state.asignaciones.append({"cedula":ced,"nombre":nom or "Invitado","cargo_key":key_cargo,"cargo_nombre":st.session_state.cargos_db[key_cargo]["nombre"],"asignado_por":"RRHH BRAGI-IA","fecha":datetime.now().strftime("%Y-%m-%d %H:%M")})
+                    st.session_state.rol="candidato"
+                    st.rerun()
+                else: st.warning("Ingresa cédula")
+
+    st.markdown('<div class="footer-login">© 2024 BRAGI-IA • Versión 2.1.0 • Soporte</div></div>', unsafe_allow_html=True)
+    st.stop()
+
+# SIDEBAR CLARO VERDE MODA
 with st.sidebar:
-    st.markdown(f'<div class="sidebar-logo"><div>{logo_html}</div><b style="color:#2D5A4A;margin-top:6px">TALENTO INTELIGENTE</b><span style="color:#6B7280;font-size:11px;letter-spacing:1px">RR.HH • BRAGI-IA</span></div>', unsafe_allow_html=True)
-    search=st.text_input("search", placeholder="Buscar en el menú... 🔍", label_visibility="collapsed")
+    search=st.text_input("search", placeholder="Buscar en el módulo... 🔍", label_visibility="collapsed")
     s=search.lower() if search else ""
     def show(t): return s in t.lower() if s else True
 
-    if show("gestion talento"):
-        with st.expander("👥 Gestión de Talento", expanded=True):
+    if show("categoria"):
+        with st.expander("📦 Categorías", expanded=True):
+            if st.button("📋 Lista Categorías", use_container_width=True): st.session_state.view="ListaCat"; st.rerun()
+            if st.button("➕ Crear Categoría", use_container_width=True): st.session_state.view="CrearCat"; st.rerun()
+            if st.button("📂 SubCategorías", use_container_width=True): st.session_state.view="ListaSubCat"; st.rerun()
+            if st.button("➕ Crear SubCategoría", use_container_width=True): st.session_state.view="CrearSubCat"; st.rerun()
+
+    if show("talento") or show("cargos"):
+        with st.expander("👥 Gestión de Talento"):
             if st.button("📌 Asignar Pruebas", use_container_width=True): st.session_state.view="Asignar"; st.rerun()
-            if st.button("👤 Ver Candidatos", use_container_width=True): st.session_state.view="Candidatos"; st.rerun()
-
-    if show("cargos"):
-        with st.expander("💼 Cargos", expanded=True):
-            if st.button("➕ Adicionar Cargo Nuevo", use_container_width=True): st.session_state.view="AddCargo"; st.rerun()
-            if st.button("📋 Ver Cargos", use_container_width=True): st.session_state.view="VerCargos"; st.rerun()
-
-    if show("preguntas"):
-        with st.expander("❓ Preguntas por Cargo", expanded=True):
-            if st.button("➕ Adicionar Preguntas que se requiera", use_container_width=True): st.session_state.view="AddPreg"; st.rerun()
-
-    if show("asignar"):
-        with st.expander("📋 Asignar Pruebas", expanded=False):
-            if st.button("📋 Ir a Asignar", use_container_width=True): st.session_state.view="Asignar"; st.rerun()
+            if st.button("💼 Ver Cargos", use_container_width=True): st.session_state.view="VerCargos"; st.rerun()
 
     if show("plan trabajo"):
         with st.expander("📅 Plan de Trabajo", expanded=True):
@@ -111,117 +153,126 @@ with st.sidebar:
             if st.button("🔄 Nuevo Proceso", use_container_width=True): st.session_state.view="AddProceso"; st.rerun()
             if st.button("🔍 Ver Procesos", use_container_width=True): st.session_state.view="VerProcesos"; st.rerun()
 
+    if show("dashboard") or show("evaluaciones"):
+        with st.expander("✅ Evaluaciones", expanded=True):
+            if st.button("📊 Dashboard", use_container_width=True): st.session_state.view="Dashboard"; st.rerun()
+
     if show("informes"):
-        with st.expander("📈 Informes", expanded=False):
+        with st.expander("📈 Informes"):
             if st.button("📈 Generar Informes", use_container_width=True): st.session_state.view="Informes"; st.rerun()
 
     if show("historicos"):
-        with st.expander("🕘 Históricos", expanded=False):
+        with st.expander("🕘 Históricos"):
             if st.button("🕘 Ver Históricos", use_container_width=True): st.session_state.view="Historicos"; st.rerun()
-
-    if show("dashboard"):
-        with st.expander("📊 Dashboard RRHH"):
-            if st.button("📊 Dashboard", use_container_width=True): st.session_state.view="Dash"; st.rerun()
-
-    if show("psicologia"):
-        with st.expander("🧠 Psicología Imágenes"):
-            if st.button("🧠 Ver Tests", use_container_width=True): st.session_state.view="Psico"; st.rerun()
 
     st.divider()
     if st.button("Cerrar sesión", use_container_width=True): st.session_state.rol=None; st.rerun()
 
+# CONTENIDO RRHH
 if st.session_state.rol=="rrhh":
     v=st.session_state.view
-    if v=="Asignar":
-        st.markdown('<div class="card"><h3>📌 Asignar Pruebas</h3></div>', unsafe_allow_html=True)
+    if v=="Dashboard":
+        c1,c2,c3,c4,c5=st.columns(5)
+        with c1: st.markdown(f'<div class="kpi-card kpi-red"><b>VENCIMIENTOS</b><br><span style="font-size:28px">🗓️ 0</span><br><small>Sin evaluar</small></div>', unsafe_allow_html=True)
+        with c2: st.markdown(f'<div class="kpi-card kpi-orange"><b>INVITADOS PENDIENTES</b><br><span style="font-size:28px">📄 {len(st.session_state.asignaciones)}</span></div>', unsafe_allow_html=True)
+        with c3: st.markdown(f'<div class="kpi-card kpi-green"><b>PRUEBAS COMPLETADAS</b><br><span style="font-size:28px">💊 {len(st.session_state.resultados)}</span></div>', unsafe_allow_html=True)
+        with c4: st.markdown(f'<div class="kpi-card kpi-orange2"><b>PLANES</b><br><span style="font-size:28px">📋 {len(st.session_state.plan_trabajo)}</span></div>', unsafe_allow_html=True)
+        with c5: st.markdown(f'<div class="kpi-card kpi-blue"><b>CATEGORIAS</b><br><span style="font-size:28px">📦 {len(st.session_state.categorias)}</span></div>', unsafe_allow_html=True)
+
+        st.markdown('<div class="card"><h3>LISTA CATEGORIAS - BRAGI-IA</h3></div>', unsafe_allow_html=True)
+        col1,col2=st.columns([3,1])
+        with col1: b=st.text_input("buscar", placeholder="🔍 Buscar categorías", label_visibility="collapsed")
+        with col2:
+            if st.button("➕ Crear Categoría", type="primary", use_container_width=True): st.session_state.view="CrearCat"; st.rerun()
+        df=pd.DataFrame(st.session_state.categorias)
+        if b: df=df[df["Descripcion"].str.contains(b.upper(), na=False)]
+        st.write(f"Total Registros: {len(df)}")
+        st.dataframe(df, use_container_width=True, hide_index=True)
+
+    elif v=="ListaCat":
+        st.markdown('<div class="card"><h3>LISTA CATEGORIAS</h3></div>', unsafe_allow_html=True)
+        st.dataframe(pd.DataFrame(st.session_state.categorias), use_container_width=True, hide_index=True)
+        if st.button("➕ Crear Categoría", type="primary"): st.session_state.view="CrearCat"; st.rerun()
+
+    elif v=="CrearCat":
+        st.markdown('<div class="card"><h3>CREAR CATEGORIA</h3></div>', unsafe_allow_html=True)
+        with st.form("crear_cat"):
+            desc=st.text_input("* Descripción Ej: CARGOS, PLAN TRABAJO")
+            if st.form_submit_button("➕ Crear Categoría", type="primary"):
+                if desc:
+                    new_id=max([c["ID"] for c in st.session_state.categorias], default=0)+1
+                    st.session_state.categorias.append({"ID":new_id,"Descripcion":desc.upper(),"Vida Util":1})
+                    st.success("Creada"); st.session_state.view="ListaCat"; st.rerun()
+
+    elif v=="ListaSubCat":
+        st.markdown('<div class="card"><h3>LISTA SUBCATEGORIAS</h3></div>', unsafe_allow_html=True)
+        if st.session_state.subcategorias: st.dataframe(pd.DataFrame(st.session_state.subcategorias), use_container_width=True)
+        else: st.info("Sin subcategorías")
+        if st.button("➕ Crear SubCategoría", type="primary"): st.session_state.view="CrearSubCat"; st.rerun()
+
+    elif v=="CrearSubCat":
+        st.markdown('<div class="card"><h3>CREAR SUBCATEGORIA</h3></div>', unsafe_allow_html=True)
+        with st.form("crear_subcat"):
+            desc=st.text_input("* Descripción")
+            cat=st.selectbox("* Categoría", [c["Descripcion"] for c in st.session_state.categorias])
+            if st.form_submit_button("➕ Crear Subcategoría", type="primary", use_container_width=True):
+                if desc and cat:
+                    st.session_state.subcategorias.append({"Descripcion":desc.upper(),"Categoria":cat,"Fecha":datetime.now().strftime("%Y-%m-%d")})
+                    st.success("Creada"); st.session_state.view="ListaSubCat"; st.rerun()
+
+    elif v=="Asignar":
+        st.markdown('<div class="card"><h3>📌 Asignar Pruebas - RRHH</h3></div>', unsafe_allow_html=True)
         with st.form("asig"):
             c1,c2=st.columns(2)
-            with c1: ced=st.text_input("Cédula*"); nom=st.text_input("Nombre*")
+            with c1: ced=st.text_input("Cédula Invitado*"); nom=st.text_input("Nombre Invitado*")
             with c2: cargo=st.selectbox("Cargo*", list(st.session_state.cargos_db.keys()), format_func=lambda x: st.session_state.cargos_db[x]["nombre"]); asig=st.text_input("Asignado por*", value="RRHH BRAGI-IA")
-            if st.form_submit_button("✅ Asignar", type="primary", use_container_width=True):
-                st.session_state.asignaciones.append({"cedula":ced,"nombre":nom,"cargo_key":cargo,"cargo_nombre":st.session_state.cargos_db[cargo]["nombre"],"asignado_por":asig,"fecha":datetime.now().strftime("%Y-%m-%d %H:%M")}); st.success("Asignado")
-
-    elif v=="AddCargo":
-        st.markdown('<div class="card"><h3>💼 Adicionar Cargos - SUB-VENTANA dentro de Cargos</h3></div>', unsafe_allow_html=True)
-        with st.form("newc"):
-            nid=st.text_input("ID*"); nnom=st.text_input("Nombre*")
-            if st.form_submit_button("💾 Crear", type="primary"):
-                if nid and nnom: st.session_state.cargos_db[nid]={"nombre":nnom,"preguntas":[]}; st.success("Creado")
-
-    elif v=="AddPreg":
-        st.markdown('<div class="card"><h3>❓ Adicionar Preguntas que se requiera - Dentro de Preguntas por Cargo</h3></div>', unsafe_allow_html=True)
-        sel=st.selectbox("Cargo", list(st.session_state.cargos_db.keys()), format_func=lambda x: st.session_state.cargos_db[x]["nombre"])
-        with st.form(f"ap_{sel}"):
-            pq=st.text_area("Pregunta*"); o1=st.text_input("Correcta*"); o2=st.text_input("O2"); o3=st.text_input("O3")
-            if st.form_submit_button("💾 Adicionar", type="primary"):
-                if pq and o1: st.session_state.cargos_db[sel]["preguntas"].append({"q":pq,"opts":[o1,o2 or "B",o3 or "C"],"ok":0}); st.success("Adicionada")
+            if st.form_submit_button("✅ Asignar como INVITADO A PRUEBA", type="primary", use_container_width=True):
+                st.session_state.asignaciones.append({"cedula":ced,"nombre":nom,"cargo_key":cargo,"cargo_nombre":st.session_state.cargos_db[cargo]["nombre"],"asignado_por":asig,"fecha":datetime.now().strftime("%Y-%m-%d %H:%M")}); st.success(f"Invitado {nom} asignado")
+        if st.session_state.asignaciones: st.dataframe(pd.DataFrame(st.session_state.asignaciones), use_container_width=True)
 
     elif v=="PlanTrabajo":
-        st.markdown('<div class="card"><h3>📅 Plan de Trabajo - Nuevo</h3></div>', unsafe_allow_html=True)
+        st.markdown('<div class="card"><h3>📅 Plan de Trabajo</h3></div>', unsafe_allow_html=True)
         with st.form("plan"):
-            c1,c2=st.columns(2)
-            with c1: titulo=st.text_input("Título*"); responsable=st.text_input("Responsable*"); ini=st.date_input("Inicio", value=date.today())
-            with c2: cargo_rel=st.selectbox("Cargo", list(st.session_state.cargos_db.keys()), format_func=lambda x: st.session_state.cargos_db[x]["nombre"]); fin=st.date_input("Fin"); pri=st.selectbox("Prioridad", ["Alta","Media","Baja"])
-            tareas=st.text_area("Tareas (una por línea)")
+            titulo=st.text_input("Título*"); resp=st.text_input("Responsable*"); cargo_rel=st.selectbox("Cargo", list(st.session_state.cargos_db.keys()), format_func=lambda x: st.session_state.cargos_db[x]["nombre"])
+            tareas=st.text_area("Tareas")
             if st.form_submit_button("💾 Guardar Plan", type="primary", use_container_width=True):
-                st.session_state.plan_trabajo.append({"titulo":titulo,"responsable":responsable,"cargo_nombre":st.session_state.cargos_db[cargo_rel]["nombre"],"inicio":str(ini),"fin":str(fin),"prioridad":pri,"tareas":tareas,"fecha":datetime.now().strftime("%Y-%m-%d %H:%M"),"estado":"En Curso"}); st.success("Plan creado")
-
-    elif v=="VerPlanes":
-        st.markdown('<div class="card"><h3>📋 Planes de Trabajo</h3></div>', unsafe_allow_html=True)
-        if st.session_state.plan_trabajo: st.dataframe(pd.DataFrame(st.session_state.plan_trabajo), use_container_width=True)
-        else: st.info("Sin planes")
-
-    elif v=="AddProceso":
-        st.markdown('<div class="card"><h3>🔄 Planeación de Procesos - Nuevo</h3></div>', unsafe_allow_html=True)
-        with st.form("proc"):
-            nombre=st.text_input("Nombre Proceso*"); resp=st.text_input("Líder*"); etapas=st.text_area("Etapas*"); tiempo=st.text_input("Tiempo Estimado")
-            if st.form_submit_button("💾 Guardar", type="primary", use_container_width=True):
-                st.session_state.procesos.append({"nombre":nombre,"responsable":resp,"etapas":etapas,"tiempo":tiempo,"fecha":datetime.now().strftime("%Y-%m-%d %H:%M")}); st.success("Guardado")
-
-    elif v=="VerProcesos":
-        st.markdown('<div class="card"><h3>🔍 Planeación de Procesos</h3></div>', unsafe_allow_html=True)
-        st.dataframe(pd.DataFrame(st.session_state.procesos), use_container_width=True)
+                st.session_state.plan_trabajo.append({"titulo":titulo,"responsable":resp,"cargo_nombre":st.session_state.cargos_db[cargo_rel]["nombre"],"tareas":tareas,"fecha":datetime.now().strftime("%Y-%m-%d %H:%M")}); st.success("Plan creado")
 
     elif v=="Informes":
-        st.markdown('<div class="card"><h3>📈 Informes</h3></div>', unsafe_allow_html=True)
-        c1,c2,c3=st.columns(3)
-        with c1: st.metric("Evaluados", len(st.session_state.resultados))
-        with c2: st.metric("Planes", len(st.session_state.plan_trabajo))
-        with c3: st.metric("Procesos", len(st.session_state.procesos))
+        st.markdown('<div class="card"><h3>📈 Informes - Históricos - BRAGI-IA</h3></div>', unsafe_allow_html=True)
         if st.session_state.resultados:
-            df=pd.DataFrame(st.session_state.resultados); st.bar_chart(df["cargo_nombre"].value_counts()); st.dataframe(df, use_container_width=True)
+            df=pd.DataFrame(st.session_state.resultados); st.dataframe(df, use_container_width=True)
+            for i,r in enumerate(df.to_dict(orient="records")):
+                pdf=gen_pdf(r); st.download_button(f"🔒 PDF {r['cedula']} {r['score']}", pdf, f"RRHH_{r['cedula']}.pdf","application/pdf", key=f"pdf_{i}")
+        else: st.info("Sin resultados")
 
     elif v=="Historicos":
         st.markdown('<div class="card"><h3>🕘 Históricos</h3></div>', unsafe_allow_html=True)
-        t1,t2,t3=st.tabs(["Asignaciones","Resultados","Planes/Procesos"])
-        with t1: st.dataframe(pd.DataFrame(st.session_state.asignaciones), use_container_width=True)
+        t1,t2=st.tabs(["Categorías","Asignaciones / Resultados"])
+        with t1: st.dataframe(pd.DataFrame(st.session_state.categorias), use_container_width=True)
         with t2:
-            if st.session_state.resultados:
-                df=pd.DataFrame(st.session_state.resultados); st.dataframe(df, use_container_width=True)
-                for i,r in enumerate(df.to_dict(orient="records")):
-                    pdf=gen_pdf(r); st.download_button(f"🔒 PDF {r['cedula']} {r['score']}", pdf, f"HIST_{r['cedula']}.pdf","application/pdf", key=f"h_{i}")
-        with t3:
-            st.write("Planes"); st.dataframe(pd.DataFrame(st.session_state.plan_trabajo), use_container_width=True)
-            st.write("Procesos"); st.dataframe(pd.DataFrame(st.session_state.procesos), use_container_width=True)
+            st.write("Asignaciones"); st.dataframe(pd.DataFrame(st.session_state.asignaciones), use_container_width=True)
+            st.write("Resultados"); st.dataframe(pd.DataFrame(st.session_state.resultados), use_container_width=True)
 
-    elif v=="Dash":
-        st.markdown('<div class="card"><h3>📊 Dashboard</h3></div>', unsafe_allow_html=True)
-        if st.session_state.resultados: st.dataframe(pd.DataFrame(st.session_state.resultados), use_container_width=True)
-        else: st.info("Sin resultados")
+    else:
+        st.markdown(f'<div class="card"><h3>{v}</h3></div>', unsafe_allow_html=True)
 
 if st.session_state.rol=="candidato":
+    with st.sidebar:
+        st.markdown(f'<div style="text-align:center;padding:10px"><b>{st.session_state.ced_actual}</b><br><span style="font-size:11px">INVITADO A PRUEBA</span></div>', unsafe_allow_html=True)
     ced=st.session_state.ced_actual; mis=[a for a in st.session_state.asignaciones if a["cedula"]==ced]
-    if not mis: st.error("Sin pruebas")
+    if not mis: st.error("Sin pruebas asignadas")
     else:
         for idx,asig in enumerate(mis):
             cargo=st.session_state.cargos_db.get(asig["cargo_key"])
             if not cargo: continue
-            st.markdown(f'<div class="card"><h3>{cargo["nombre"]}</h3></div>', unsafe_allow_html=True)
+            st.markdown(f'<div class="card"><h3>👋 Hola {asig["nombre"]} - Invitado a Prueba {cargo["nombre"]}</h3></div>', unsafe_allow_html=True)
             with st.form(f"f{idx}"):
                 resps=[]
                 for i,pr in enumerate(cargo["preguntas"]):
                     st.write(f"**{i+1}. {pr['q']}**"); r=st.radio("Elige", pr["opts"], index=None, key=f"r{idx}_{i}"); resps.append(r)
-                if st.form_submit_button("🚀 FINALIZAR", type="primary", use_container_width=True):
+                if st.form_submit_button("🚀 FINALIZAR PRUEBA", type="primary", use_container_width=True):
                     ac=sum(1 for j,rr in enumerate(resps) if rr==cargo["preguntas"][j]["opts"][0]); tot=len(cargo["preguntas"]) or 1; sc=int(ac/tot*100)
                     st.session_state.resultados.append({"cedula":ced,"nombre":asig["nombre"],"cargo_nombre":cargo["nombre"],"asignado_por":asig["asignado_por"],"score":f"{sc}%","score_num":sc,"fecha":datetime.now().strftime("%Y-%m-%d %H:%M")})
-                    st.balloons(); st.success(f"✅ {sc}% Enviado")
+                    st.balloons(); st.success(f"✅ {sc}% - Prueba enviada a RRHH")
+    if st.button("Cerrar sesión invitado"): st.session_state.rol=None; st.rerun()
