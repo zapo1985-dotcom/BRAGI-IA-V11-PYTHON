@@ -2,67 +2,33 @@ import streamlit as st
 import pandas as pd
 from datetime import datetime, date
 
-st.set_page_config(page_title="BRAGI-IA V30 MENU FIJO", page_icon="🛡️", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="BRAGI-IA V32 FINAL", page_icon="🛡️", layout="wide", initial_sidebar_state="expanded")
 
-# CSS - MENU FIJO QUE NO SE ESCONDE + LETRAS NEGRAS + SIN RALLAS + AZUL VERDOSO #176B5E
 st.markdown("""
 <style>
 .stApp{background:#E8F5E9!important}
-
-/* MENU FIJO QUE NO SE ESCONDE - FIX TU ULTIMA FOTO */
-button[data-testid="stSidebarCollapsedControl"], button[data-testid="collapsedControl"], div[data-testid="stSidebarCollapsedControl"]{display:none!important;visibility:hidden!important}
-[data-testid="stSidebar"]{
-    background:#176B5E!important;
-    min-width:310px!important;
-    max-width:310px!important;
-    position:fixed!important;
-    left:0!important;
-    top:0!important;
-    height:100vh!important;
-    z-index:999999!important;
-    transform:none!important;
-    visibility:visible!important;
-    overflow-y:auto!important;
-}
-section[data-testid="stSidebar"]{transform:none!important;visibility:visible!important}
-[data-testid="stSidebar"] > div{padding-top:10px!important}
-
-/* BOTONES SIDEBAR FONDO BLANCO LETRA NEGRA - FIX NO SE VEIA */
-section[data-testid="stSidebar"] button{
-    background:white!important;
-    color:black!important;
-    border-radius:10px!important;
-    font-weight:800!important;
-    border:1.5px solid #B2DFDB!important;
-    height:44px!important;
-    margin:3px 0!important;
-}
-section[data-testid="stSidebar"] button p,
-section[data-testid="stSidebar"] button span,
-section[data-testid="stSidebar"] button div{
-    color:black!important;
-    font-weight:800!important;
-    font-size:13px!important;
-}
-section[data-testid="stSidebar"] button:hover{background:#E0F2F1!important}
-
+[data-testid="stSidebar"]{background:#176B5E!important;min-width:320px!important;max-width:320px!important}
+[data-testid="stSidebar"] > div{padding-top:5px!important}
+button[data-testid="stSidebarCollapsedControl"]{display:none!important}
 [data-testid="stSidebar"] input{background:white!important;color:black!important;border-radius:12px!important}
-div[data-testid="stExpander"]{background:#1F7A6B!important;border-radius:12px!important;margin:6px 0!important}
+section[data-testid="stSidebar"].stButton > button{
+    background:white!important;color:black!important;border-radius:10px!important;
+    font-weight:800!important;border:1.5px solid #B2DFDB!important;height:46px!important;margin:4px 0!important;width:100%!important;text-align:left!important;
+}
+section[data-testid="stSidebar"].stButton > button p, section[data-testid="stSidebar"].stButton > button span, section[data-testid="stSidebar"].stButton > button div{
+    color:black!important;font-weight:800!important;font-size:13px!important;
+}
+section[data-testid="stSidebar"].stButton > button:hover{background:#E0F2F1!important}
+div[data-testid="stExpander"]{background:#1F7A6B!important;border-radius:12px!important;margin:6px 0!important;border:none!important}
 div[data-testid="stExpander"][open]{background:#248A7A!important}
 div[data-testid="stExpander"] summary p{color:white!important;font-weight:700!important}
-
-/* CASILLAS BLANCAS SIN RALLAS LETRA NEGRA */
 div[data-testid="stTextInput"] > div, div[data-testid="stTextArea"] > div, div[data-testid="stSelectbox"] > div, div[data-testid="stNumberInput"] > div, div[data-testid="stFileUploader"] > div{
     background:white!important;border:1.5px solid #C8E6C9!important;border-radius:12px!important;background-image:none!important;
 }
 input, textarea{color:black!important;font-weight:600!important;background:white!important}
-
-/* TODO TEXTO NEGRO EN AREA BLANCA - QUITAR <div sty */
 h1,h2,h3,p,label{color:black!important}
 div[data-testid="stDataFrame"] *{color:black!important}
-
-/* CONTENIDO PRINCIPAL CON MARGEN PARA NO TAPAR MENU FIJO */
-section.main > div{margin-left:310px!important;padding-left:20px!important}
+div.block-container{padding-left:20px!important;max-width:100%!important}
 </style>
 """, unsafe_allow_html=True)
 
@@ -75,10 +41,10 @@ if "plan_trabajo" not in st.session_state: st.session_state.plan_trabajo=[]
 if "planeacion" not in st.session_state: st.session_state.planeacion=[]
 if "pruebas_psicologicas" not in st.session_state:
     st.session_state.pruebas_psicologicas=[
-        {"ID":1,"Nombre":"16PF","Tipo":"Personalidad","Descripción":"16 factores","Duración":"30 min"},
-        {"ID":2,"Nombre":"DISC","Tipo":"Comportamiento","Descripción":"DISC","Duración":"15 min"},
-        {"ID":3,"Nombre":"Wartegg","Tipo":"Proyectiva","Descripción":"8 cuadros","Duración":"25 min"},
-        {"ID":4,"Nombre":"ICF IE","Tipo":"Emocional","Descripción":"Inteligencia Emocional","Duración":"20 min"},
+        {"ID":1,"Nombre":"16PF - Cattell","Tipo":"Personalidad","Descripción":"16 factores"},
+        {"ID":2,"Nombre":"DISC","Tipo":"Comportamiento","Descripción":"Dominancia, Influencia, Estabilidad, Conciencia"},
+        {"ID":3,"Nombre":"Wartegg","Tipo":"Proyectiva","Descripción":"8 cuadros proyectivos"},
+        {"ID":4,"Nombre":"ICF Inteligencia Emocional","Tipo":"Emocional","Descripción":"Test IE"},
     ]
 if "categorias" not in st.session_state:
     st.session_state.categorias=[
@@ -93,21 +59,19 @@ if "cargos_db" not in st.session_state:
         "aux_contable":{"nombre":"Auxiliar Contable","area":"Contabilidad","preguntas":[{"q":"¿Qué es PUC?","opts":["Plan Único de Cuentas","Pago Único","Presupuesto"],"ok":0}]},
         "abogado":{"nombre":"Abogado Tutelas PQR","area":"Jurídica","preguntas":[{"q":"¿Término tutela?","opts":["10 días","1 año"],"ok":0}]},
         "quimico":{"nombre":"Químico Farmacéutico","area":"Farmacia","preguntas":[{"q":"¿BPM según INVIMA?","opts":["Buenas Prácticas Manufactura","Buen Pago"],"ok":0}]},
-        "regente":{"nombre":"Regente de Farmacia","area":"Farmacia","preguntas":[{"q":"¿Qué es dispensación?","opts":["Entrega informada","Venta libre","Almacenamiento"],"ok":0}]},
+        "regente":{"nombre":"Regente de Farmacia","area":"Farmacia","preguntas":[{"q":"¿Qué es dispensación?","opts":["Entrega informada de medicamentos","Venta libre","Almacenamiento"],"ok":0}]},
     }
 
 def analizar_hv_ia(texto, cargo):
     texto=texto.lower(); score=0
     for kw in ["contabilidad","puc","derecho","tutela","farmacia","invima","medicamentos","experiencia","universidad"]:
         if kw in texto: score+=15
-    score=min(score,100)
-    concepto="PERFIL ALTO" if score>=70 else "PERFIL MEDIO" if score>=40 else "PERFIL BÁSICO"
-    return score, concepto
+    return min(score,100), "PERFIL ALTO" if score>=60 else "PERFIL MEDIO"
 
 if st.session_state.rol is None:
-    st.markdown("<h2 style='color:black;text-align:center'>BRAGI-IA V30 - MENU FIJO - LETRAS NEGRAS</h2>", unsafe_allow_html=True)
-    col1,col2=st.columns(2)
-    with col1:
+    st.markdown("<h2 style='text-align:center;color:black'>BRAGI-IA - Plataforma Talento Humano</h2>", unsafe_allow_html=True)
+    c1,c2=st.columns(2)
+    with c1:
         st.subheader("Iniciar Sesión")
         org=st.selectbox("Organización", ["RRHH","INVITADO A PRUEBA"])
         if org=="RRHH":
@@ -123,13 +87,19 @@ if st.session_state.rol is None:
                     if not any(a.get("cedula")==ced for a in st.session_state.asignaciones):
                         st.session_state.asignaciones.append({"cedula":ced,"nombre":f"Invitado {ced}","cargo_key":"aux_contable","cargo_nombre":"Auxiliar Contable","area":"Contabilidad","fecha":datetime.now().strftime("%Y-%m-%d %H:%M")})
                     st.session_state.ced_actual=ced; st.session_state.rol="candidato"; st.rerun()
-    with col2:
-        st.info("V30 - Menú fijo que no se esconde - Azul Verdoso #176B5E - Letras Negras - Sin <div style")
+    with c2:
+        st.markdown("""
+        <div style='background:#176B5E;border-radius:16px;padding:20px;text-align:center;color:white'>
+        <h3 style='color:white!important'>BRAGI-IA</h3>
+        <p style='color:#B2DFDB!important'>HR INTELLIGENCE</p>
+        <p style='color:white!important;font-size:12px'>1. Categoría<br>2. Psicología<br>3. Hoja de Vida IA</p>
+        </div>
+        """, unsafe_allow_html=True)
     st.stop()
 
 with st.sidebar:
-    st.markdown("<h3 style='color:white!important;margin:0'>BRAGI-IA V30</h3><p style='color:#B2DFDB!important;font-size:11px'>MENU FIJO - NO SE ESCONDE</p>", unsafe_allow_html=True)
-    bus=st.text_input("Buscar", placeholder="Buscar en el m... 🔍", label_visibility="collapsed")
+    st.markdown("<h3 style='color:white!important'>BRAGI-IA</h3><p style='color:#B2DFDB!important;font-size:11px'>Menú fijo</p>", unsafe_allow_html=True)
+    bus=st.text_input("Buscar", placeholder="Buscar...", label_visibility="collapsed")
 
     with st.expander("📦 1. Categoría - Cargos", expanded=True):
         if st.button("📋 Lista Categorías", use_container_width=True): st.session_state.view="ListaCategorias"; st.rerun()
@@ -164,12 +134,11 @@ if st.session_state.rol=="rrhh":
         c3.metric("HV IA", f"{len(st.session_state.hojas_vida)}")
         c4.metric("PSICOLOGÍA", f"{len(st.session_state.pruebas_psicologicas)}")
         c5.metric("RESULTADOS", f"{len(st.session_state.resultados)}")
-        st.subheader("LISTA CATEGORIAS - Módulo 1 - Menú Fijo")
+        st.subheader("LISTA CATEGORIAS")
         st.dataframe(pd.DataFrame(st.session_state.categorias), use_container_width=True, hide_index=True)
 
     elif v=="ListaCategorias":
         st.subheader("📦 1. CATEGORÍA - Lista Categorías")
-        st.write("En el área quédate crear categoría - Módulo separado - Menú fijo no se esconde")
         col1,col2=st.columns([3,1])
         with col1: b=st.text_input("Buscar", placeholder="🔍 Buscar categorías", label_visibility="collapsed", key="bcat")
         with col2:
@@ -200,7 +169,7 @@ if st.session_state.rol=="rrhh":
         if st.button("➕ Crear SubCategoría", type="primary"): st.session_state.view="CrearSubCat"; st.rerun()
 
     elif v=="CrearSubCat":
-        st.subheader("CREAR SUBCATEGORIA - Sin rallas")
+        st.subheader("CREAR SUBCATEGORIA")
         with st.form("crear_sub"):
             desc=st.text_area("Descripción / Pregunta *")
             cats=[c.get("Descripción","") for c in st.session_state.categorias]
@@ -235,8 +204,7 @@ if st.session_state.rol=="rrhh":
                     st.success("Creada"); st.session_state.view="Psicologia"; st.rerun()
 
     elif v=="HojaVidaIA":
-        st.subheader("📄 3. HOJA DE VIDA - En otro lado - IA Opcional")
-        st.write("Campo opcional no requisito")
+        st.subheader("📄 3. HOJA DE VIDA - IA Opcional")
         with st.form("hv_ia"):
             ced=st.text_input("Cédula candidato (opcional)")
             cargo_sel=st.selectbox("Cargo a evaluar", list(st.session_state.cargos_db.keys()), format_func=lambda x: st.session_state.cargos_db[x]["nombre"])
@@ -255,7 +223,7 @@ if st.session_state.rol=="rrhh":
         if st.session_state.hojas_vida: st.dataframe(pd.DataFrame(st.session_state.hojas_vida), use_container_width=True)
 
     elif v=="HojasAnalizadas":
-        st.subheader("📄 Hojas Analizadas - Módulo 3")
+        st.subheader("📄 Hojas Analizadas")
         if st.session_state.hojas_vida: st.dataframe(pd.DataFrame(st.session_state.hojas_vida), use_container_width=True)
         else: st.info("Sin hojas")
 
